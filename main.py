@@ -2,6 +2,13 @@ import pandas as pd
 import os
 import time
 from datetime import datetime
+from time import mktime
+import matplotlib
+import  matplotlib.pyplot as plt
+from matplotlib import style
+style.use("dark_background")
+import re
+
 
 path = "E:/hiru/works/ml/project1/intraQuarter"
 
@@ -17,7 +24,8 @@ def key_stats(gather="Total Debt/Equity (mrq)"):
                                'Price',
                                'stock_p_change',
                                'SP500',
-                               'sp500_p_change'])
+                               'sp500_p_change',
+                               'Difference'])
 
     sp500_df = pd.DataFrame.from_csv("YAHOO-INDEX_GSPC.csv.txt")
     #sp500_df = pd.read_csv("YAHOO-INDEX_GSPC.csv")
@@ -43,7 +51,18 @@ def key_stats(gather="Total Debt/Equity (mrq)"):
                 source = open(full_file_path, 'r').read()
                 #print(source)
                 try:
-                    value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                    try:
+                        value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                    except Exception as e:
+                        try:
+                            value = float(source.split(gather + ':</td>\n<td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                            #print(str(e), ticker , file)
+
+                        except Exception as e:
+                            pass
+                            #value = float(source.split(gather + ':</td>\n<td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                            #print(str(e),ticker,file)
+                            #time.sleep(15)
                     try:
                         sp500_date = datetime.fromtimestamp(unix_time).strftime('%y-%m-%d')
                         row = sp500_df[(sp500_df.index == sp500_date)]
@@ -53,9 +72,25 @@ def key_stats(gather="Total Debt/Equity (mrq)"):
                         sp500_date = datetime.fromtimestamp(unix_time-259200).strftime('%y-%m-%d')
                         row = sp500_df[(sp500_df.index == sp500_date)]
                         sp500_value = float(row["Adj Close"])
-
-                    stock_price = float(source.split('</small><big><b>')[1].split('</b></big>')[0])
-                    #print("stock_price:", stock_price, "Ticker:",ticker)
+                    try:
+                        stock_price = float(source.split('</small><big><b>')[1].split('</b></big>')[0])
+                        #print("stock_price:", stock_price, "Ticker:",ticker)
+                    except Exception as e:
+                      #  <span id = "yfs_l10_aep" > 39.52 </span>
+                        try:
+                            stock_price = (source.split('</small><big><b>')[1].split('</b></big>')[0])
+                            stock_price = re.search(r'(\d{1,9}\.\d{1,8})',stock_price)
+                            stock_price = float(stock_price.group(1))
+                            print(stock_price)
+                            time.sleep(15)
+                        except Exception as e:
+                            stock_price = (source.split('<span class="time_rtq_ticker">')[1].split('</span>')[0])
+                            stock_price = re.search(r'(\d{1,9}\.\d{1,8})', stock_price)
+                            stock_price = float(stock_price.group(1))
+                            #print('latest',stock_price)
+                            #print('stock price', str(e),ticker,file)
+                            #time.sleep(15)
+                       # print(str(e), ticker, file)
 
                     if not starting_stock_value:
                         starting_stock_value = stock_price
@@ -72,12 +107,24 @@ def key_stats(gather="Total Debt/Equity (mrq)"):
                                     'Price':stock_price,
                                     'stock_p_change':stock_p_change,
                                     'SP500':sp500_value,
-                                    'sp500_p_change':sp500_p_change}, ignore_index=True)
+                                    'sp500_p_change':sp500_p_change,
+                                    'Difference':stock_p_change-sp500_p_change}, ignore_index=True)
                 except Exception as e:
                     pass
 
                 #get the totle deb of each company for each file
                 #print(ticker + ":", value)
+
+    for each_ticker in tiker_list:
+        try:
+            plot_df = df[(df['Ticker'] == each_ticker)]
+            plot_df = plot_df.set_index(['Date'])
+
+            plot_df['Difference'].plot(label=each_ticker)
+            plt.legend()
+        except:
+            pass
+    plt.show()
 
     save = gather.replace(' ','').replace(')','').replace('(','').replace('/','')+str('.csv')
     print(save)
