@@ -10,6 +10,7 @@ def key_stats(gather="Total Debt/Equity (mrq)"):
     stats_path = path + '/_KeyStats'
     stock_list = [x[0] for x in os.walk(stats_path)]
     # print(stock_list)
+    df = pd.DataFrame(columns=['Date', 'Unix', 'Ticker', 'DE Ratio'])
 
     for each_dir in stock_list[1:]:
         each_file = os.listdir(each_dir)
@@ -26,12 +27,17 @@ def key_stats(gather="Total Debt/Equity (mrq)"):
                 #print(full_file_path)
                 source = open(full_file_path, 'r').read()
                 #print(source)
-               # value = source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0]
                 try:
-                    value = source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0]
-                except IndexError:
-                    value = 'null'
+                    value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
+                    df = df.append({'Date':date_stamp,'Unix':unix_time, 'Ticker':ticker, 'DE Ratio':value }, ignore_index=True)
+                except Exception as e:
+                    pass
                 #get the totle deb of each company for each file
-                print(ticker + ":", value)
-            time.sleep(15)
+                #print(ticker + ":", value)
+
+    save = gather.replace(' ','').replace(')','').replace('(','').replace('/','')+str('.csv')
+    print(save)
+    df.to_csv(save)
+
+
 key_stats()

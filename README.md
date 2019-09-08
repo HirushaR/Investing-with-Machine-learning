@@ -3,6 +3,8 @@
 with Scikit learn we try to apply to real time database         
 with stock market database, 
 im trying to predict what is the best company to invest         
+
+in here TotalDebtRquitymrq.csv file is our traning data file       
     
 **Contributor**         
 Hirushar Randunu           
