@@ -238,7 +238,7 @@ def Key_Stats(gather=["Total Debt/Equity" ,
                     pass
 
                 # get the totle deb of each company for each file
-                # print(ticker + ":", value)
+                print(ticker + ":", value)
 
     # for each_ticker in tiker_list:
     #     try:
