@@ -101,7 +101,7 @@ def Key_Stats(gather=["Total Debt/Equity" ,
     # sp500_df = pd.read_csv("YAHOO-INDEX_GSPC.csv")
     tiker_list = []
 
-    for each_dir in stock_list[1:]:
+    for each_dir in stock_list[1:10]:
         each_file = os.listdir(each_dir)
         # each file get file names
         ticker = each_dir.split("\\")[1]
@@ -240,24 +240,24 @@ def Key_Stats(gather=["Total Debt/Equity" ,
                 # get the totle deb of each company for each file
                 print(ticker + ":", value)
 
-    # for each_ticker in tiker_list:
-    #     try:
-    #         plot_df = df[(df['Ticker'] == each_ticker)]
-    #         plot_df = plot_df.set_index(['Date'])
-    #
-    #         if plot_df['Status'][-1] == "underperform":
-    #             color = 'r'
-    #         else:
-    #             color = 'g'
-    #
-    #         plot_df['Difference'].plot(label=each_ticker, color=color)
-    #
-    #         plt.legend()
-    #     except:
-    #         pass
-    # plt.show()
+    for each_ticker in tiker_list:
+        try:
+            plot_df = df[(df['Ticker'] == each_ticker)]
+            plot_df = plot_df.set_index(['Date'])
+
+            if plot_df['Status'][-1] == "underperform":
+                color = 'r'
+            else:
+                color = 'g'
+
+            plot_df['Difference'].plot(label=each_ticker, color=color)
+
+            plt.legend()
+        except:
+            pass
+    plt.show()
 
     # save = gather.replace(' ', '').replace(')', '').replace('(', '').replace('/', '') + str('.csv')
     # print(save)
-    df.to_csv("key_stats.csv")
+    #df.to_csv("key_stats.csv")
 Key_Stats()
